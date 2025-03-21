@@ -1,13 +1,13 @@
-# urldecode-wrap(1) -- Execute commands with URL-decoded arguments
+# urldecode-wrapper(1) -- Execute commands with URL-decoded arguments
 
 ## SYNOPSIS
 
-`urldecode-wrap [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]`  
-`urldecode-wrap --filter [EXECUTABLE [ARGUMENTS...]]`
+`urldecode-wrapper [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]`  
+`urldecode-wrapper --filter [EXECUTABLE [ARGUMENTS...]]`
 
 ## DESCRIPTION
 
-`urldecode-wrap` decodes URL-encoded arguments and passes them to the specified executable. It is designed to work with LLM-generated commands containing special characters that would normally require complex shell escaping.
+`urldecode-wrapper` decodes URL-encoded arguments and passes them to the specified executable. It is designed to work with LLM-generated commands containing special characters that would normally require complex shell escaping.
 
 In filter mode (`--filter`), it also processes URL-encoded input from stdin.
 
@@ -57,32 +57,32 @@ There is no harm in URL-encoding liberally - non-special characters pass through
 
 Basic usage with URL-encoded argument:
 ```
-urldecode-wrap sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
+urldecode-wrapper sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
 ```
 
 Preview mode to see decoded arguments:
 ```
-urldecode-wrap --preview grep "search%20term%20with%20spaces" filename
+urldecode-wrapper --preview grep "search%20term%20with%20spaces" filename
 ```
 
 Using as a filter to decode URL-encoded content:
 ```
-echo "SELECT%20*%20FROM%20users" | urldecode-wrap --filter
+echo "SELECT%20*%20FROM%20users" | urldecode-wrapper --filter
 ```
 
 Reading URL-encoded content, decoding it, and piping to a command:
 ```
-echo "SELECT%20*%20FROM%20users" | urldecode-wrap --filter sqlite3 mydatabase.db
+echo "SELECT%20*%20FROM%20users" | urldecode-wrapper --filter sqlite3 mydatabase.db
 ```
 
 Complex regex with many special characters:
 ```
-urldecode-wrap grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
+urldecode-wrapper grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
 ```
 
 Using find with URL-encoded semicolon:
 ```
-urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
+urldecode-wrapper find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 ```
 
 ## NOTES
