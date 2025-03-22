@@ -67,8 +67,11 @@ USAGE WITH LLMs
     1. Ask the LLM to URL-encode any arguments containing special characters
        (spaces, quotes, semicolons, etc.)
     
-    2. ALWAYS wrap URL-encoded arguments in double quotes to prevent the shell
-       from interpreting special characters before they reach this script
+    2. Consider wrapping URL-encoded arguments in double quotes if they contain 
+       characters that the shell might interpret (like spaces, wildcards, etc.).
+       While the percent sign itself isn't generally interpreted by the shell,
+       quoting ensures all parts of your encoded argument are properly passed to
+       the script
     
     3. For commands with shell metacharacters, encode ALL potentially problematic characters:
        - Spaces (%20) - IMPORTANT: Always use %20 for spaces, never use + signs
@@ -121,7 +124,7 @@ EXAMPLES
 NOTES
     - This script automatically detects and decodes ALL arguments
     - Non-URL-encoded arguments are passed through unchanged
-    - Double-quoting URL-encoded arguments is essential
+    - Double-quoting URL-encoded arguments is recommended if they contain shell metacharacters
     - This script can be used with any executable program
     - Be liberal with URL encoding - encode ANY character that might have special
       meaning in shell contexts (spaces, quotes, semicolons, brackets, braces,
@@ -129,7 +132,7 @@ NOTES
     - NEVER use + to represent spaces - always use %20 for spaces
     - Plus signs (+) will pass through unchanged if not encoded, but encoding them as %2B
       is recommended for clarity and consistency
-    - Always place URL-encoded strings in double quotes
+    - Consider placing URL-encoded strings in double quotes if they contain shell metacharacters
     - For find's -exec terminator, encode the semicolon as %3B and put it in double quotes: "%3B"
     - For multi-line code with indentation (e.g., with python -c), ensure spaces are encoded as %20
       and newlines as %0A

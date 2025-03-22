@@ -31,7 +31,7 @@ When working with LLMs to generate complex command arguments:
 
 1. **Instruct the LLM to URL-encode special characters**: Ask the LLM to URL-encode any arguments containing special characters (spaces, quotes, semicolons, etc.)
 
-2. **Always use double quotes**: ALWAYS wrap URL-encoded arguments in double quotes to prevent the shell from interpreting special characters before they reach this script.
+2. **Consider using double quotes**: Wrap URL-encoded arguments in double quotes if they contain characters that the shell might interpret (like spaces, wildcards, etc.). While the percent sign itself isn't generally interpreted by the shell, quoting ensures all parts of your encoded argument are properly passed to the script.
 
 3. **Be comprehensive with encoding**: For commands with shell metacharacters, encode ALL potentially problematic characters:
    - Spaces (`%20`) - IMPORTANT: Always use `%20` for spaces, never use + signs
@@ -107,12 +107,12 @@ urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "
 
 - **Automatic detection**: This script automatically detects and decodes ALL arguments
 - **Transparency**: Non-URL-encoded arguments are passed through unchanged
-- **Double quotes required**: ALWAYS wrap URL-encoded arguments in double quotes
+- **Double quotes consideration**: Wrap URL-encoded arguments in double quotes if they contain shell metacharacters
 - **Universal compatibility**: Works with any executable program
 - **Be comprehensive**: Encode ANY character that might have special meaning in shell contexts
 - **Space encoding**: ALWAYS use %20 for spaces, NEVER use + signs
 - **Plus signs**: Encode plus signs as %2B for clarity and consistency
-- **String protection**: Always place URL-encoded strings in double quotes
+- **String protection**: Consider placing URL-encoded strings in double quotes if they contain shell metacharacters
 - **Find command**: For find's -exec terminator, encode the semicolon as %3B and put in double quotes: "%3B"
 - **Multi-line code**: For code with indentation (e.g., with python -c), encode spaces as %20 and newlines as %0A
 - **Filter mode**: In filter mode (--filter), stdin is processed line by line, decoding each line
