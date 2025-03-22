@@ -2,7 +2,7 @@
 
 [![Test urlargs](https://github.com/mhalle/urlargs/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urlargs/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/Version-1.3.0-brightgreen.svg)](https://github.com/mhalle/urlargs/releases/tag/v1.3.0)
+[![Version](https://img.shields.io/badge/Version-1.4.1-brightgreen.svg)](https://github.com/mhalle/urlargs/releases/tag/v1.4.0)
 
 ## Synopsis
 
@@ -200,14 +200,23 @@ This project is licensed under the Apache License, Version 2.0. See the [LICENSE
 
 ## Shell Compatibility
 
-`urlargs` is designed to work with multiple shell environments:
+`urlargs` offers two implementations:
 
-- **Bash**: Fully compatible with Bash, the default shell on many systems
-- **sh**: Works with the standard POSIX shell
-- **dash**: Compatible with Debian's lightweight shell
-- **zsh**: Works with the Z shell
+1. **Shell Implementation**
+   - **Bash**: Fully compatible with Bash, the default shell on many systems
+   - **zsh**: Works with the Z shell
+   - **macOS sh**: Works with the macOS version of sh
+   - **dash/sh**: NOT compatible with Debian's dash or standard POSIX sh
 
-All shells are automatically tested in our CI pipeline to ensure reliable operation across different environments.
+2. **Perl Implementation** (in `perl/urlargs.pl`)
+   - Cross-platform compatibility with any system that has Perl installed
+   - Requires the URI::Escape module
+   - Significantly faster for large inputs
+   - Works with all shells
+
+Both implementations provide identical functionality and command-line interface.
+
+The CI test suite tests the shell implementation with a variety of shells as well as the Perl implementation.
 
 ## Bugs and limitations
 
