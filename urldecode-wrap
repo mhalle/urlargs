@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Parse command-line options
+# Initialize command-line option flags
 preview=false
 show_help=false
 filter_mode=false
 
-# Process all options that start with --
+# Process command-line options
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --)
@@ -113,6 +113,9 @@ EXAMPLES
     # Using find with URL-encoded semicolon
     urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 
+    # Working with newlines
+    urldecode-wrap echo "hello%0Aworld"
+
 NOTES
     - This script automatically detects and decodes ALL arguments
     - Non-URL-encoded arguments are passed through unchanged
@@ -134,43 +137,25 @@ EOF
     exit 0
 fi
 
-# Function to URL decode a string
+# Function to URL decode a string that handles newlines and other special characters
 urldecode() {
-    # Replace + with space (but only if we're using standard URL encoding mode)
-    local data="$1"
+    local encoded="$1"
+    # Convert each '%' to '\x' for printf to interpret as hex codes
+    local replaced
+    replaced="$(echo -n "$encoded" | sed 's/%/\\x/g')"
     
-    # Decode percent-encoded octets
-    local i=0
-    local len=${#data}
-    local result=""
-    
-    while [ $i -lt $len ]; do
-        local c="${data:$i:1}"
-        if [ "$c" = "%" ] && [ $i -lt $((len-2)) ]; then
-            local hex="${data:$i+1:2}"
-            # Use printf to convert hex to character - preserves whitespace exactly
-            local char=$(printf "\\x$hex")
-            result+="$char"
-            i=$((i+3))
-        else
-            result+="$c"
-            i=$((i+1))
-        fi
-    done
-    
-    # Important: Echo without newline to preserve exact whitespace
-    printf '%s' "$result"
+    # Use printf with %b to interpret escape sequences
+    printf '%b' "$replaced"
 }
 
-# Process URL-encoded stdin in filter mode
+# Process URL-encoded stdin line by line in filter mode
 filter_stdin() {
     local line
-    local decoded
     
-    # Read line by line from stdin
+    # Read line by line from stdin, preserving whitespace
     while IFS= read -r line; do
-        decoded=$(urldecode "$line")
-        printf "%s\n" "$decoded"
+        # Decode and output each line
+        printf '%s\n' "$(urldecode "$line")"
     done
 }
 
@@ -192,11 +177,9 @@ fi
 executable="$1"
 shift
 
-# Process all remaining arguments (decode them)
+# Decode all arguments and store them in an array
 declare -a decoded_args
 for arg in "$@"; do
-    # Store decoded argument directly in the array
-    # This preserves all special characters without reinterpretation
     decoded_args+=("$(urldecode "$arg")")
 done
 
@@ -211,16 +194,16 @@ fi
 
 # Execute the command with decoded arguments
 if [ "$filter_mode" = true ]; then
-    # Create a temporary file for stdin
+    # Create a temporary file for decoded stdin content
     tmp_file=$(mktemp)
     trap 'rm -f "$tmp_file"' EXIT
     
-    # Process stdin through the URL decoder and save to temp file
+    # Decode stdin and save to temporary file
     filter_stdin > "$tmp_file"
     
-    # Execute with decoded stdin
+    # Execute command with decoded stdin
     exec "$executable" "${decoded_args[@]}" < "$tmp_file"
 else
-    # Execute normally without stdin processing
+    # Execute command with decoded arguments only
     exec "$executable" "${decoded_args[@]}"
 fi
