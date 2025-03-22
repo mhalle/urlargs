@@ -1,0 +1,22 @@
+name: Test urldecode-wrap
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Make script executable
+      run: chmod +x urldecode-wrap tests/run_tests.sh tests/test_*.sh
+    
+    - name: Run tests
+      run: ./tests/run_tests.sh
