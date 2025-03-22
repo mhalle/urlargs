@@ -7,7 +7,7 @@
 
 ## DESCRIPTION
 
-`urldecode-wrap` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments or SQL queries that might contain special characters for the shell are passed as arguments.
+`urldecode-wrap` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments, regular expressions, or SQL queries that might contain special characters for the shell are passed as arguments.
 
 In filter mode (`--filter`), it also decodes URL-encoded input from stdin, making it versatile for various command-line scenarios.
 
