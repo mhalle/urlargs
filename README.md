@@ -153,6 +153,10 @@ Michael Halle (urldecode-wrap@m.halle.us)
 
 This utility is specifically designed to simplify complex command arguments when working with LLM-generated shell commands.
 
+## LICENSE
+
+This project is licensed under the Apache License, Version 2.0. See the [LICENSE.md](LICENSE.md) file for details.
+
 ## BUGS AND LIMITATIONS
 
 - Currently processes one line at a time in filter mode
