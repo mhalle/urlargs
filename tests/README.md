@@ -1,16 +1,24 @@
-# Test Suite for urldecode-wrap
+# Test Suite for urlargs
 
-This directory contains a comprehensive test suite for the `urldecode-wrap` utility.
+This directory contains a comprehensive test suite for the `urlargs` utility.
 
 ## Running the Tests
 
-To run the complete test suite:
+To run the complete test suite with the default shell (bash):
 
 ```bash
 ./run_tests.sh
 ```
 
-The test runner will execute all test files and report the results, including the number of passed and failed tests.
+To run the tests with a specific shell:
+
+```bash
+./run_tests.sh sh     # Run with the POSIX shell
+./run_tests.sh zsh    # Run with the Z shell
+./run_tests.sh dash   # Run with Debian's dash shell
+```
+
+The test runner will execute all test files using the specified shell and report the results, including the number of passed and failed tests.
 
 ## Individual Test Files
 

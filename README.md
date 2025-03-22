@@ -2,7 +2,7 @@
 
 [![Test urlargs](https://github.com/mhalle/urlargs/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urlargs/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/Version-1.1.0-brightgreen.svg)](https://github.com/mhalle/urlargs/releases/tag/v1.1.0)
+[![Version](https://img.shields.io/badge/Version-1.3.0-brightgreen.svg)](https://github.com/mhalle/urlargs/releases/tag/v1.3.0)
 
 ## Synopsis
 
@@ -135,6 +135,20 @@ urlargs grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
 urlargs find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 ```
 
+### Using with interpreters like Python, Node.js, Ruby, or Perl:
+```bash
+# Execute Python code with proper whitespace and indentation
+urlargs python -c "import%20sys%0Afor%20i%20in%20range(5)%3A%0A%20%20%20%20print(f'Line%20{i}')"
+
+# Or pipe URL-encoded source code to an interpreter
+echo "import%20sys%0Afor%20i%20in%20range(5)%3A%0A%20%20%20%20print(f'Line%20{i}')" | urlargs --filter | python
+
+# Works with other interpreters too
+echo "console.log('Hello%20world');" | urlargs --filter | node
+echo "puts%20'Hello%20world'" | urlargs --filter | ruby
+echo "print%20'Hello%20world\\n';" | urlargs --filter | perl
+```
+
 ## Important notes for LLMs
 
 - **Automatic detection**: This script automatically detects and decodes ALL arguments
@@ -183,6 +197,17 @@ Michael Halle (urldecode-wrap@m.halle.us)
 ## License
 
 This project is licensed under the Apache License, Version 2.0. See the [LICENSE.md](LICENSE.md) file for details.
+
+## Shell Compatibility
+
+`urlargs` is designed to work with multiple shell environments:
+
+- **Bash**: Fully compatible with Bash, the default shell on many systems
+- **sh**: Works with the standard POSIX shell
+- **dash**: Compatible with Debian's lightweight shell
+- **zsh**: Works with the Z shell
+
+All shells are automatically tested in our CI pipeline to ensure reliable operation across different environments.
 
 ## Bugs and limitations
 

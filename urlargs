@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # 
-# urlargs v1.1.0
+# urlargs v1.3.0
 # Copyright 2025 Michael Halle (urldecode-wrap@m.halle.us)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,45 +16,10 @@
 # limitations under the License.
 #
 
-# Initialize command-line option flags
-dry_run=false
-show_help=false
-filter_mode=false
+set -e # Exit immediately on error (from v1.2.0)
 
-# Process command-line options
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --)
-            # End of options marker
-            shift
-            break
-            ;;
-        --help)
-            show_help=true
-            shift
-            ;;
-        --dry-run)
-            dry_run=true
-            shift
-            ;;
-        --filter)
-            filter_mode=true
-            shift
-            ;;
-        --*)
-            echo "Unknown option: $1"
-            echo "Try '$0 --help' for more information."
-            exit 1
-            ;;
-        *)
-            # First non-option argument is the executable
-            break
-            ;;
-    esac
-done
-
-# Show detailed help if requested
-if $show_help; then
+# Function to show comprehensive help (from v1.1.0)
+show_help_message() {
     cat << 'EOF'
 URLARGS - Run commands with URL-decoded arguments
 
@@ -156,22 +121,72 @@ NOTES
     - For multi-line code with indentation (e.g., with python -c), ensure spaces are encoded as %20
       and newlines as %0A
     - In filter mode (--filter), stdin is processed line by line, decoding each line
-
 EOF
     exit 0
-fi
+}
 
-# Function to URL decode a string that handles newlines and other special characters
-# Properly handles invalid percent encodings (e.g., '%' not followed by two hex digits)
+# Function to handle command-line options (improved from v1.2.0)
+handle_options() {
+    local dry_run=false
+    local show_help=false
+    local filter_mode=false
+
+    while getopts ":-:" opt; do
+        case $opt in
+            -)
+                case "${OPTARG}" in
+                    help)
+                        show_help=true
+                        ;;
+                    dry-run)
+                        dry_run=true
+                        ;;
+                    filter)
+                        filter_mode=true
+                        ;;
+                    "")  # -- by itself
+                        break
+                        ;;
+                    *)
+                        printf "Unknown option: --%s\n" "$OPTARG" >&2
+                        printf "Try '%s --help' for more information.\n" "$0" >&2
+                        exit 1
+                        ;;
+                esac
+                ;;
+            :)
+                printf "Option --%s requires an argument.\n" "$OPTARG" >&2
+                exit 1
+                ;;
+            \?)
+                printf "Invalid option: -%s\n" "$OPTARG" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if $show_help; then
+        show_help_message
+    fi
+    
+    # Return values using global variables
+    g_dry_run=$dry_run
+    g_filter_mode=$filter_mode
+    
+    # Store where optind ended
+    g_optind=$OPTIND
+}
+
+# Function to URL decode a string (improved from v1.2.0 with comments from v1.1.0)
 urldecode() {
     local encoded="$1"
     local i=0
     local len=${#encoded}
     local result=""
-    
+
     while [ $i -lt $len ]; do
         local char="${encoded:$i:1}"
-        
+
         # Check for percent encoding
         if [ "$char" = "%" ] && [ $((i+2)) -lt $len ]; then
             # Get the next two characters
@@ -222,16 +237,28 @@ filter_stdin() {
     done
 }
 
+# --- Main Script ---
+
+# Initialize global variables for option values
+g_dry_run=false
+g_filter_mode=false
+g_optind=1
+
+# Handle command-line options
+handle_options "$@"
+# Shift by the number g_optind-1 that was handled in handle_options
+shift "$((g_optind-1))"
+
 # Ensure we have at least one argument (the executable) unless in filter mode
-if [ $# -lt 1 ] && [ "$filter_mode" = false ]; then
-    echo "Error: No executable specified."
-    echo "Usage: $0 [--dry-run] [--help] [--filter] EXECUTABLE [ARGUMENTS...]"
-    echo "Try '$0 --help' for more information."
+if [ $# -lt 1 ] && [ "$g_filter_mode" = false ]; then
+    printf "Error: No executable specified.\n" >&2
+    printf "Usage: %s [--dry-run] [--help] [--filter] EXECUTABLE [ARGUMENTS...]\n" "$0" >&2
+    printf "Try '%s --help' for more information.\n" "$0" >&2
     exit 1
 fi
 
 # Handle filter mode without executable (output to stdout)
-if [ "$filter_mode" = true ] && [ $# -eq 0 ]; then
+if [ "$g_filter_mode" = true ] && [ $# -eq 0 ]; then
     filter_stdin
     exit 0
 fi
@@ -247,18 +274,20 @@ for arg in "$@"; do
 done
 
 # Dry run mode
-if $dry_run; then
-    echo "Command: $executable"
-    for i in "${!decoded_args[@]}"; do
-        printf "Arg %d: '%s'\n" $((i+1)) "${decoded_args[$i]}"
+if $g_dry_run; then
+    printf "Command: %s\n" "$executable"
+    i=0
+    for arg in "${decoded_args[@]}"; do
+        printf "Arg %d: '%s'\n" "$((i+1))" "$arg"
+        i=$((i+1))
     done
     exit 0
 fi
 
 # Execute the command with decoded arguments
-if [ "$filter_mode" = true ]; then
+if [ "$g_filter_mode" = true ]; then
     # Create a temporary file for decoded stdin content
-    tmp_file=$(mktemp)
+    tmp_file=$(mktemp) || { printf "Error: Could not create temporary file.\n" >&2; exit 1; }
     trap 'rm -f "$tmp_file"' EXIT
     
     # Decode stdin and save to temporary file

@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Test runner for urlargs
 # Runs all tests and reports results
+#
+# Usage: ./run_tests.sh [shell]
+#   where [shell] is an optional shell to use (bash, sh, zsh, etc.)
+#   Default: bash
 
 set -e  # Exit on error
 
@@ -34,12 +38,13 @@ TESTS_FAILED=0
 run_test() {
     local test_file="$1"
     local test_name="$(basename "$test_file" .sh)"
+    local test_shell="${2:-bash}"  # Default to bash if no shell specified
     
-    echo -e "${YELLOW}Running test: ${test_name}${NC}"
+    echo -e "${YELLOW}Running test: ${test_name} with ${test_shell}${NC}"
     TESTS_TOTAL=$((TESTS_TOTAL + 1))
     
-    # Run the test
-    if bash "$test_file" "$SCRIPT_PATH"; then
+    # Run the test with the specified shell
+    if "$test_shell" "$test_file" "$SCRIPT_PATH"; then
         echo -e "${GREEN}✓ Test passed: ${test_name}${NC}"
         TESTS_PASSED=$((TESTS_PASSED + 1))
         return 0
@@ -50,10 +55,21 @@ run_test() {
     fi
 }
 
+# Get the shell to use for tests
+TEST_SHELL="${1:-bash}"  # Default to bash if no shell is specified
+
+# Check if the shell is available
+if ! command -v "$TEST_SHELL" >/dev/null 2>&1; then
+    echo -e "${RED}Error: Shell $TEST_SHELL not found or not executable${NC}"
+    exit 1
+fi
+
+echo -e "${YELLOW}Using shell: $TEST_SHELL${NC}"
+
 # Run all test files
 for test_file in "$TEST_DIR"/test_*.sh; do
     if [ -f "$test_file" ]; then
-        run_test "$test_file"
+        run_test "$test_file" "$TEST_SHELL"
         echo ""
     fi
 done
