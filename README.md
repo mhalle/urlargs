@@ -1,6 +1,7 @@
 # urldecode-wrap -- Execute commands with URL-decoded arguments
 
 [![Test urldecode-wrap](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## SYNOPSIS
 
