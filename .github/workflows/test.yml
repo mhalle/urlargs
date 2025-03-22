@@ -1,4 +1,4 @@
-name: Test urldecode-wrap
+name: Test urlargs
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
         fetch-depth: 0
     
     - name: Make script executable
-      run: chmod +x urldecode-wrap tests/run_tests.sh tests/test_*.sh
+      run: chmod +x urlargs tests/run_tests.sh tests/test_*.sh
     
     - name: Run tests
       run: ./tests/run_tests.sh

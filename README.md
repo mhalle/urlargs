@@ -1,16 +1,16 @@
-# urldecode-wrap — Execute commands with URL-decoded arguments
+# urlargs — Execute commands with URL-decoded arguments
 
-[![Test urldecode-wrap](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml)
+[![Test urlargs](https://github.com/mhalle/urlargs/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urlargs/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Synopsis
 
-`urldecode-wrap [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]`  
-`urldecode-wrap --filter [EXECUTABLE [ARGUMENTS...]]`
+`urlargs [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]`  
+`urlargs --filter [EXECUTABLE [ARGUMENTS...]]`
 
 ## Description
 
-`urldecode-wrap` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments, regular expressions, or SQL queries that might contain special characters for the shell are passed as arguments.
+`urlargs` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments, regular expressions, or SQL queries that might contain special characters for the shell are passed as arguments.
 
 In filter mode (`--filter`), it also decodes URL-encoded input from stdin, making it versatile for various command-line scenarios.
 
@@ -66,7 +66,7 @@ There is no harm in URL-encoding liberally - non-special characters pass through
 **Example transformation:**
 ```
 Original command:  find /path -name "file with spaces" -exec grep "pattern" {} \;
-Using urldecode-wrap:  urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
+Using urlargs:  urlargs find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 ```
 
 ## Examples
@@ -74,43 +74,43 @@ Using urldecode-wrap:  urldecode-wrap find /path -name "file%20with%20spaces" -e
 ### Basic usage with URL-encoded argument:
 ```bash
 # Original: sqlite3 mydatabase.db "SELECT * FROM users"
-urldecode-wrap sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
+urlargs sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
 ```
 
 ### Working with multi-line text (using %0A for newlines):
 ```bash
 # Original: echo -e "hello\nworld"
-urldecode-wrap echo "hello%0Aworld"
+urlargs echo "hello%0Aworld"
 ```
 
 ### Dry run mode to see decoded arguments:
 ```bash
 # Shows what would be executed without running it
-urldecode-wrap --dry-run grep "search%20term%20with%20spaces" filename
+urlargs --dry-run grep "search%20term%20with%20spaces" filename
 ```
 
 ### Using as a filter to decode URL-encoded content:
 ```bash
 # Decode data from stdin and output to stdout
-echo "SELECT%20*%20FROM%20users" | urldecode-wrap --filter
+echo "SELECT%20*%20FROM%20users" | urlargs --filter
 ```
 
 ### Reading URL-encoded content, decoding it, and piping to a command:
 ```bash
 # Decode data from stdin and pass to the command
-echo "SELECT%20*%20FROM%20users" | urldecode-wrap --filter sqlite3 mydatabase.db
+echo "SELECT%20*%20FROM%20users" | urlargs --filter sqlite3 mydatabase.db
 ```
 
 ### Complex regex with many special characters:
 ```bash
 # Original: grep "^[wxy]+\.*$" filename.txt
-urldecode-wrap grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
+urlargs grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
 ```
 
 ### Using find with URL-encoded semicolon:
 ```bash
 # Original: find /path -name "file with spaces" -exec grep "pattern" {} \;
-urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
+urlargs find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 ```
 
 ## Important notes for LLMs

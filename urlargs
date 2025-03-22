@@ -1,0 +1,271 @@
+#!/bin/bash
+# 
+# Copyright 2025 Michael Halle (urldecode-wrap@m.halle.us)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Initialize command-line option flags
+dry_run=false
+show_help=false
+filter_mode=false
+
+# Process command-line options
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --)
+            # End of options marker
+            shift
+            break
+            ;;
+        --help)
+            show_help=true
+            shift
+            ;;
+        --dry-run)
+            dry_run=true
+            shift
+            ;;
+        --filter)
+            filter_mode=true
+            shift
+            ;;
+        --*)
+            echo "Unknown option: $1"
+            echo "Try '$0 --help' for more information."
+            exit 1
+            ;;
+        *)
+            # First non-option argument is the executable
+            break
+            ;;
+    esac
+done
+
+# Show detailed help if requested
+if $show_help; then
+    cat << 'EOF'
+URLARGS - Run commands with URL-decoded arguments
+
+SYNOPSIS
+    urlargs [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]
+    urlargs --filter [EXECUTABLE [ARGUMENTS...]]
+
+DESCRIPTION
+    This script decodes URL-encoded arguments and passes them to the specified 
+    executable. It addresses shell quoting challenges in many scripting scenarios,
+    particularly ones where scripts call other scripts or arguments like code
+    fragments, regular expressions, or SQL queries that might contain special
+    characters for the shell are passed as arguments.
+    
+    In filter mode (--filter), it also decodes URL-encoded input from stdin.
+
+OPTIONS
+    --help      Display this detailed help message
+    --dry-run   Show decoded arguments without executing the command
+    --filter    Process URL-encoded stdin in addition to arguments
+    --          End option processing (useful if the executable name begins with --)
+
+USAGE WITH LLMs
+    When working with LLMs to generate complex command arguments:
+    
+    1. Ask the LLM to URL-encode any arguments containing special characters
+       (spaces, quotes, semicolons, etc.)
+    
+    2. Consider wrapping URL-encoded arguments in double quotes if they contain 
+       characters that the shell might interpret (like spaces, wildcards, etc.).
+       While the percent sign itself isn't generally interpreted by the shell,
+       quoting ensures all parts of your encoded argument are properly passed to
+       the script
+    
+    3. For commands with shell metacharacters, encode ALL potentially problematic characters:
+       - Spaces (%20) - IMPORTANT: Always use %20 for spaces, never use + signs
+       - Plus signs (%2B) - not required but good practice to encode them
+       - Quotes (%27 for single, %22 for double)
+       - Semicolons (%3B)
+       - Asterisks/wildcards (%2A)
+       - Question marks (%3F)
+       - Square brackets (%5B and %5D)
+       - Parentheses (%28 and %29)
+       - Angle brackets (%3C and %3E)
+       - Pipes (%7C)
+       - Ampersands (%26)
+       - Dollar signs (%24)
+       - Backslashes (%5C)
+       - Backticks (%60)
+       - Exclamation marks (%21)
+       - Newlines (%0A)
+       - Carriage returns (%0D)
+       - Form feeds (%0C)
+       - Any other character with special meaning in shells
+       
+       There is no harm in URL-encoding liberally - non-special characters 
+       pass through unchanged, while potentially problematic ones are protected.
+       
+       Example with find command:
+       Original:  find /path -name "file with spaces" -exec grep "pattern" {} \;
+       Wrapped:   urlargs find /path -name "file%20with%20spaces" \
+                  -exec grep "pattern%20with%20quotes" {} "%3B"
+
+EXAMPLES
+    # Basic usage with URL-encoded argument
+    urlargs sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
+    
+    # Dry run mode to see decoded arguments
+    urlargs --dry-run grep "search%20term%20with%20spaces" filename
+    
+    # Using as a filter to decode URL-encoded content
+    echo "SELECT%20*%20FROM%20users" | urlargs --filter
+    
+    # Reading URL-encoded content, decoding it, and piping to a command
+    echo "SELECT%20*%20FROM%20users" | urlargs --filter sqlite3 mydatabase.db
+    
+    # Complex regex with many special characters
+    urlargs grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
+    
+    # Using find with URL-encoded semicolon
+    urlargs find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
+
+    # Working with newlines
+    urlargs echo "hello%0Aworld"
+
+NOTES
+    - This script automatically detects and decodes ALL arguments
+    - Non-URL-encoded arguments are passed through unchanged
+    - Double-quoting URL-encoded arguments is recommended if they contain shell metacharacters
+    - This script can be used with any executable program
+    - Be liberal with URL encoding - encode ANY character that might have special
+      meaning in shell contexts (spaces, quotes, semicolons, brackets, braces,
+      parentheses, backslashes, exclamation marks, etc.)
+    - NEVER use + to represent spaces - always use %20 for spaces
+    - Plus signs (+) will pass through unchanged if not encoded, but encoding them as %2B
+      is recommended for clarity and consistency
+    - Consider placing URL-encoded strings in double quotes if they contain shell metacharacters
+    - For find's -exec terminator, encode the semicolon as %3B and put it in double quotes: "%3B"
+    - For multi-line code with indentation (e.g., with python -c), ensure spaces are encoded as %20
+      and newlines as %0A
+    - In filter mode (--filter), stdin is processed line by line, decoding each line
+
+EOF
+    exit 0
+fi
+
+# Function to URL decode a string that handles newlines and other special characters
+# Properly handles invalid percent encodings (e.g., '%' not followed by two hex digits)
+urldecode() {
+    local encoded="$1"
+    local i=0
+    local len=${#encoded}
+    local result=""
+    
+    while [ $i -lt $len ]; do
+        local char="${encoded:$i:1}"
+        
+        # Check for percent encoding
+        if [ "$char" = "%" ] && [ $((i+2)) -lt $len ]; then
+            # Get the next two characters
+            local hex="${encoded:$i+1:2}"
+            
+            # Check if they are valid hex digits using regex
+            if [[ $hex =~ ^[0-9A-Fa-f]{2}$ ]]; then
+                # Valid percent encoding - convert hex to ASCII
+                if [[ $hex == "0A" || $hex == "0a" ]]; then
+                    # Newline character
+                    result+=$'\n'
+                elif [[ $hex == "0D" || $hex == "0d" ]]; then
+                    # Carriage return
+                    result+=$'\r'
+                else
+                    # Other characters
+                    result+=$(printf "\\x$hex")
+                fi
+                i=$((i+3))
+            else
+                # Invalid percent encoding - preserve as-is
+                result+="%"
+                i=$((i+1))
+            fi
+        elif [ "$char" = "%" ]; then
+            # Trailing % at the end - preserve as-is
+            result+="%"
+            i=$((i+1))
+        else
+            # Regular character
+            result+="$char"
+            i=$((i+1))
+        fi
+    done
+    
+    # Output the result
+    printf '%s' "$result"
+}
+
+# Process URL-encoded stdin line by line in filter mode
+filter_stdin() {
+    local line
+    
+    # Read line by line from stdin, preserving whitespace
+    while IFS= read -r line; do
+        # Decode and output each line
+        printf '%s\n' "$(urldecode "$line")"
+    done
+}
+
+# Ensure we have at least one argument (the executable) unless in filter mode
+if [ $# -lt 1 ] && [ "$filter_mode" = false ]; then
+    echo "Error: No executable specified."
+    echo "Usage: $0 [--dry-run] [--help] [--filter] EXECUTABLE [ARGUMENTS...]"
+    echo "Try '$0 --help' for more information."
+    exit 1
+fi
+
+# Handle filter mode without executable (output to stdout)
+if [ "$filter_mode" = true ] && [ $# -eq 0 ]; then
+    filter_stdin
+    exit 0
+fi
+
+# The executable to run is the first argument
+executable="$1"
+shift
+
+# Decode all arguments and store them in an array
+declare -a decoded_args
+for arg in "$@"; do
+    decoded_args+=("$(urldecode "$arg")")
+done
+
+# Dry run mode
+if $dry_run; then
+    echo "Command: $executable"
+    for i in "${!decoded_args[@]}"; do
+        printf "Arg %d: '%s'\n" $((i+1)) "${decoded_args[$i]}"
+    done
+    exit 0
+fi
+
+# Execute the command with decoded arguments
+if [ "$filter_mode" = true ]; then
+    # Create a temporary file for decoded stdin content
+    tmp_file=$(mktemp)
+    trap 'rm -f "$tmp_file"' EXIT
+    
+    # Decode stdin and save to temporary file
+    filter_stdin > "$tmp_file"
+    
+    # Execute command with decoded stdin
+    exec "$executable" "${decoded_args[@]}" < "$tmp_file"
+else
+    # Execute command with decoded arguments only
+    exec "$executable" "${decoded_args[@]}"
+fi

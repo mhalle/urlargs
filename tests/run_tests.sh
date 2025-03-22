@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test runner for urldecode-wrap
+# Test runner for urlargs
 # Runs all tests and reports results
 
 set -e  # Exit on error
@@ -8,7 +8,7 @@ set -e  # Exit on error
 # Get the directory where this script is located
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_DIR="$(dirname "$TEST_DIR")"
-SCRIPT_PATH="$SCRIPT_DIR/urldecode-wrap"
+SCRIPT_PATH="$SCRIPT_DIR/urlargs"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -22,7 +22,7 @@ if [ ! -x "$SCRIPT_PATH" ]; then
     exit 1
 fi
 
-echo -e "${YELLOW}Running urldecode-wrap test suite...${NC}"
+echo -e "${YELLOW}Running urlargs test suite...${NC}"
 echo ""
 
 # Track test results
