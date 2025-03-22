@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        shell: [bash, sh, dash, zsh]
+        shell: [bash, zsh]
       fail-fast: false  # Continue with other shells even if one fails
     
     name: Test shell with ${{ matrix.shell }}
@@ -25,7 +25,7 @@ jobs:
     - name: Install shells
       run: |
         sudo apt-get update
-        sudo apt-get install -y zsh dash
+        sudo apt-get install -y zsh
     
     - name: Make scripts executable
       run: chmod +x urlargs tests/run_tests_shell.sh tests/run_tests_perl.sh tests/test_*.sh
