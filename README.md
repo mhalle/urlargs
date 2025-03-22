@@ -7,7 +7,7 @@
 
 ## DESCRIPTION
 
-`urldecode-wrap` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It's specifically designed for working with LLM-generated commands containing special characters that would normally require complex shell escaping.
+`urldecode-wrap` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments or SQL queries that might contain special characters for the shell are passed as arguments.
 
 In filter mode (`--filter`), it also decodes URL-encoded input from stdin, making it versatile for various command-line scenarios.
 
@@ -16,7 +16,7 @@ In filter mode (`--filter`), it also decodes URL-encoded input from stdin, makin
 `--help`
 : Display a detailed help message and exit.
 
-`--preview`
+`--dry-run`
 : Show decoded arguments without executing the command.
 
 `--filter`
@@ -73,10 +73,10 @@ urldecode-wrap sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
 urldecode-wrap echo "hello%0Aworld"
 ```
 
-### Preview mode to see decoded arguments:
+### Dry run mode to see decoded arguments:
 ```bash
 # Shows what would be executed without running it
-urldecode-wrap --preview grep "search%20term%20with%20spaces" filename
+urldecode-wrap --dry-run grep "search%20term%20with%20spaces" filename
 ```
 
 ### Using as a filter to decode URL-encoded content:

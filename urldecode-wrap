@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Initialize command-line option flags
-preview=false
+dry_run=false
 show_help=false
 filter_mode=false
 
@@ -17,8 +17,8 @@ while [[ $# -gt 0 ]]; do
             show_help=true
             shift
             ;;
-        --preview)
-            preview=true
+        --dry-run)
+            dry_run=true
             shift
             ;;
         --filter)
@@ -48,14 +48,16 @@ SYNOPSIS
 
 DESCRIPTION
     This script decodes URL-encoded arguments and passes them to the specified 
-    executable. It's designed to work with LLM-generated commands containing 
-    special characters that would normally require complex shell escaping.
+    executable. It addresses shell quoting challenges in many scripting scenarios,
+    particularly ones where scripts call other scripts or arguments like code
+    fragments or SQL queries that might contain special characters for the shell
+    are passed as arguments.
     
     In filter mode (--filter), it also decodes URL-encoded input from stdin.
 
 OPTIONS
     --help      Display this detailed help message
-    --preview   Show decoded arguments without executing the command
+    --dry-run   Show decoded arguments without executing the command
     --filter    Process URL-encoded stdin in addition to arguments
     --          End option processing (useful if the executable name begins with --)
 
@@ -98,8 +100,8 @@ EXAMPLES
     # Basic usage with URL-encoded argument
     urldecode-wrap sqlite3 mydatabase.db "SELECT%20*%20FROM%20users"
     
-    # Preview mode to see decoded arguments
-    urldecode-wrap --preview grep "search%20term%20with%20spaces" filename
+    # Dry run mode to see decoded arguments
+    urldecode-wrap --dry-run grep "search%20term%20with%20spaces" filename
     
     # Using as a filter to decode URL-encoded content
     echo "SELECT%20*%20FROM%20users" | urldecode-wrap --filter
@@ -201,7 +203,7 @@ filter_stdin() {
 # Ensure we have at least one argument (the executable) unless in filter mode
 if [ $# -lt 1 ] && [ "$filter_mode" = false ]; then
     echo "Error: No executable specified."
-    echo "Usage: $0 [--preview] [--help] [--filter] EXECUTABLE [ARGUMENTS...]"
+    echo "Usage: $0 [--dry-run] [--help] [--filter] EXECUTABLE [ARGUMENTS...]"
     echo "Try '$0 --help' for more information."
     exit 1
 fi
@@ -222,8 +224,8 @@ for arg in "$@"; do
     decoded_args+=("$(urldecode "$arg")")
 done
 
-# Preview mode
-if $preview; then
+# Dry run mode
+if $dry_run; then
     echo "Command: $executable"
     for i in "${!decoded_args[@]}"; do
         printf "Arg %d: '%s'\n" $((i+1)) "${decoded_args[$i]}"
