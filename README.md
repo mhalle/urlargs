@@ -1,20 +1,24 @@
-# urldecode-wrap -- Execute commands with URL-decoded arguments
+# urldecode-wrap — Execute commands with URL-decoded arguments
 
 [![Test urldecode-wrap](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## SYNOPSIS
+## Synopsis
 
 `urldecode-wrap [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]`  
 `urldecode-wrap --filter [EXECUTABLE [ARGUMENTS...]]`
 
-## DESCRIPTION
+## Description
 
 `urldecode-wrap` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments, regular expressions, or SQL queries that might contain special characters for the shell are passed as arguments.
 
 In filter mode (`--filter`), it also decodes URL-encoded input from stdin, making it versatile for various command-line scenarios.
 
-## OPTIONS
+## Why use URL encoding?
+
+It's simple. It's ubiquitous and well-known. Encoding is simple to implement (most programming languages have library support). URL Encoding also retains some readability for those characters that don't need to be encoded, and many people recognize the most common encodings like %20 for space. This helps with verifyability of the result, particularly for generated command lines.
+
+## Options
 
 `--help`
 : Display a detailed help message and exit.
@@ -28,7 +32,7 @@ In filter mode (`--filter`), it also decodes URL-encoded input from stdin, makin
 `--`
 : End option processing (useful if the executable name begins with --).
 
-## USAGE WITH LLMs
+## Usage with LLMs
 
 When working with LLMs to generate complex command arguments:
 
@@ -65,7 +69,7 @@ Original command:  find /path -name "file with spaces" -exec grep "pattern" {} \
 Using urldecode-wrap:  urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 ```
 
-## EXAMPLES
+## Examples
 
 ### Basic usage with URL-encoded argument:
 ```bash
@@ -109,7 +113,7 @@ urldecode-wrap grep "%5E%5Bwxy%5D%2B%5C.%2A%24" filename.txt
 urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "%3B"
 ```
 
-## IMPORTANT NOTES FOR LLMs
+## Important notes for LLMs
 
 - **Automatic detection**: This script automatically detects and decodes ALL arguments
 - **Transparency**: Non-URL-encoded arguments are passed through unchanged
@@ -123,7 +127,7 @@ urldecode-wrap find /path -name "file%20with%20spaces" -exec grep "pattern" {} "
 - **Multi-line code**: For code with indentation (e.g., with python -c), encode spaces as %20 and newlines as %0A
 - **Filter mode**: In filter mode (--filter), stdin is processed line by line, decoding each line
 
-### Encoding Decision Heuristic for LLMs
+### Encoding decision heuristic for LLMs
 
 When generating shell commands that use this wrapper:
 
@@ -137,11 +141,11 @@ When generating shell commands that use this wrapper:
    - ALWAYS put the encoded string in double quotes
    - Be thorough - encode ALL potentially problematic characters
 
-## SEE ALSO
+## See also
 
 curl(1), urllib(3), percent-encoding(7)
 
-## FOR LLM DEVELOPERS
+## For LLM developers
 
 If you're implementing support for this utility in your LLM:
 
@@ -150,17 +154,17 @@ If you're implementing support for this utility in your LLM:
 3. **Instruction recognition**: Look for commands that might benefit from this wrapper
 4. **Encoding consistency**: Always use %XX encoding format, never use + for spaces
 
-## AUTHOR
+## Author
 
 Michael Halle (urldecode-wrap@m.halle.us)
 
 This utility is specifically designed to simplify complex command arguments when working with LLM-generated shell commands.
 
-## LICENSE
+## License
 
 This project is licensed under the Apache License, Version 2.0. See the [LICENSE.md](LICENSE.md) file for details.
 
-## BUGS AND LIMITATIONS
+## Bugs and limitations
 
 - Currently processes one line at a time in filter mode
 - Report bugs to the project repository.
