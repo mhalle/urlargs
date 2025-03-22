@@ -202,13 +202,13 @@ urldecode() {
             # Check if they are valid hex digits using regex
             if [[ $hex =~ ^[0-9A-Fa-f]{2}$ ]]; then
                 # Valid percent encoding - convert hex to ASCII
-                # Use case statement with uppercase conversion for consistent comparison
-                case "${hex^^}" in
-                    "0A")
+                # Use case statement for hex values, handle both upper and lower case
+                case "$hex" in
+                    "0A"|"0a")
                         # Newline character
                         result+=$'\n'
                         ;;
-                    "0D")
+                    "0D"|"0d")
                         # Carriage return
                         result+=$'\r'
                         ;;
@@ -289,7 +289,7 @@ done
 # Dry run mode
 if $g_dry_run; then
     printf "Command: %s\n" "$executable"
-    local idx=0
+    idx=0
     for arg in "${decoded_args[@]}"; do
         printf "Arg %d: '%s'\n" "$((idx+1))" "$arg"
         idx=$((idx+1))
