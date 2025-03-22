@@ -2,6 +2,7 @@
 
 [![Test urlargs](https://github.com/mhalle/urlargs/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urlargs/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Version](https://img.shields.io/badge/Version-1.1.0-brightgreen.svg)](https://github.com/mhalle/urlargs/releases/tag/v1.1.0)
 
 ## Synopsis
 
