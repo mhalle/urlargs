@@ -138,6 +138,7 @@ EOF
 fi
 
 # Function to URL decode a string that handles newlines and other special characters
+# TODO: Improve handling of invalid percent encodings (e.g., '%' not followed by two hex digits)
 urldecode() {
     local encoded="$1"
     # Convert each '%' to '\x' for printf to interpret as hex codes
