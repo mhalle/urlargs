@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # 
-# urlargs v1.0.0 (Perl implementation)
+# urlargs v1.4.0 (Perl implementation)
 # Copyright 2025 Michael Halle (urldecode-wrap@m.halle.us)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
