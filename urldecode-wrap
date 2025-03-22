@@ -138,15 +138,53 @@ EOF
 fi
 
 # Function to URL decode a string that handles newlines and other special characters
-# TODO: Improve handling of invalid percent encodings (e.g., '%' not followed by two hex digits)
+# Properly handles invalid percent encodings (e.g., '%' not followed by two hex digits)
 urldecode() {
     local encoded="$1"
-    # Convert each '%' to '\x' for printf to interpret as hex codes
-    local replaced
-    replaced="$(echo -n "$encoded" | sed 's/%/\\x/g')"
+    local i=0
+    local len=${#encoded}
+    local result=""
     
-    # Use printf with %b to interpret escape sequences
-    printf '%b' "$replaced"
+    while [ $i -lt $len ]; do
+        local char="${encoded:$i:1}"
+        
+        # Check for percent encoding
+        if [ "$char" = "%" ] && [ $((i+2)) -lt $len ]; then
+            # Get the next two characters
+            local hex="${encoded:$i+1:2}"
+            
+            # Check if they are valid hex digits using regex
+            if [[ $hex =~ ^[0-9A-Fa-f]{2}$ ]]; then
+                # Valid percent encoding - convert hex to ASCII
+                if [[ $hex == "0A" || $hex == "0a" ]]; then
+                    # Newline character
+                    result+=$'\n'
+                elif [[ $hex == "0D" || $hex == "0d" ]]; then
+                    # Carriage return
+                    result+=$'\r'
+                else
+                    # Other characters
+                    result+=$(printf "\\x$hex")
+                fi
+                i=$((i+3))
+            else
+                # Invalid percent encoding - preserve as-is
+                result+="%"
+                i=$((i+1))
+            fi
+        elif [ "$char" = "%" ]; then
+            # Trailing % at the end - preserve as-is
+            result+="%"
+            i=$((i+1))
+        else
+            # Regular character
+            result+="$char"
+            i=$((i+1))
+        fi
+    done
+    
+    # Output the result
+    printf '%s' "$result"
 }
 
 # Process URL-encoded stdin line by line in filter mode

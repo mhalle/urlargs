@@ -61,29 +61,21 @@ test_long_string() {
 }
 
 # Test 3: Partial URL encoding (only some % signs)
-# KNOWN LIMITATION: Currently, invalid % sequences are converted to escape sequences
-# TODO: Future enhancement to properly handle invalid percent encodings
 test_partial_encoding() {
-    echo "SKIP: Partial URL encoding test - known limitation with invalid % sequences"
-    return 0  # Skip this test for now
+    local result
+    result=$("$SCRIPT_PATH" echo "partially%20encoded%string%with%invalid%sequences")
     
-    # Ideal behavior would be:
-    # local result
-    # result=$("$SCRIPT_PATH" echo "partially%20encoded%string%with%invalid%sequences")
-    # assert_equals "partially encoded%string%with%invalid%sequences" "$result" "Partial URL encoding"
+    # The % followed by invalid hex characters should remain unchanged
+    assert_equals "partially encoded%string%with%invalid%sequences" "$result" "Partial URL encoding"
 }
 
 # Test 4: Invalid % sequences at the end
-# KNOWN LIMITATION: Currently, trailing % are converted to escape sequences
-# TODO: Future enhancement to properly handle invalid percent encodings
 test_invalid_end_sequence() {
-    echo "SKIP: Invalid end sequence test - known limitation with trailing % character"
-    return 0  # Skip this test for now
+    local result
+    result=$("$SCRIPT_PATH" echo "invalid%20at%20the%20end%")
     
-    # Ideal behavior would be:
-    # local result
-    # result=$("$SCRIPT_PATH" echo "invalid%20at%20the%20end%")
-    # assert_equals "invalid at the end%" "$result" "Invalid % sequence at the end"
+    # The % at the end should remain unchanged
+    assert_equals "invalid at the end%" "$result" "Invalid % sequence at the end"
 }
 
 # Test 5: Double-encoded URL

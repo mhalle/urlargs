@@ -151,5 +151,4 @@ This utility is specifically designed to simplify complex command arguments when
 ## BUGS AND LIMITATIONS
 
 - Currently processes one line at a time in filter mode
-- Limited handling of invalid percent encodings (e.g., % not followed by two hex digits)
 - Report bugs to the project repository.
