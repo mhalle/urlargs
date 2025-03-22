@@ -4,21 +4,22 @@ This directory contains a comprehensive test suite for the `urlargs` utility.
 
 ## Running the Tests
 
-To run the complete test suite with the default shell (bash):
+To test the shell implementation with a specific shell:
 
 ```bash
-./run_tests.sh
+./run_tests_shell.sh           # Test shell implementation with bash (default)
+./run_tests_shell.sh bash      # Test shell implementation with bash
+./run_tests_shell.sh zsh       # Test shell implementation with zsh
+./run_tests_shell.sh sh        # Test shell implementation with POSIX sh
 ```
 
-To run the tests with a specific shell:
+To test the Perl implementation:
 
 ```bash
-./run_tests.sh sh     # Run with the POSIX shell
-./run_tests.sh zsh    # Run with the Z shell
-./run_tests.sh dash   # Run with Debian's dash shell
+./run_tests_perl.sh            # Test Perl implementation
 ```
 
-The test runner will execute all test files using the specified shell and report the results, including the number of passed and failed tests.
+The test runner will execute all test files against the specified implementation and report the results, including the number of passed and failed tests.
 
 ## Individual Test Files
 
