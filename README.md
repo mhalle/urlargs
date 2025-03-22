@@ -49,6 +49,9 @@ When working with LLMs to generate complex command arguments:
    - Backslashes (`%5C`)
    - Backticks (`%60`)
    - Exclamation marks (`%21`)
+   - Newlines (`%0A`)
+   - Carriage returns (`%0D`)
+   - Form feeds (`%0C`)
    - Any other character with special meaning in shells
 
 There is no harm in URL-encoding liberally - non-special characters pass through unchanged, while potentially problematic ones are protected.
@@ -145,6 +148,8 @@ If you're implementing support for this utility in your LLM:
 4. **Encoding consistency**: Always use %XX encoding format, never use + for spaces
 
 ## AUTHOR
+
+Michael Halle (urldecode-wrap@m.halle.us)
 
 This utility is specifically designed to simplify complex command arguments when working with LLM-generated shell commands.
 
