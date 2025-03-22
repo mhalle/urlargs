@@ -19,7 +19,7 @@ The test suite is organized into the following test files:
 1. **test_basic_functionality.sh**: Tests the core functionality of executing commands with decoded arguments
 2. **test_filter_mode.sh**: Tests the filter mode for processing stdin
 3. **test_special_characters.sh**: Tests decoding of various special characters
-4. **test_preview_mode.sh**: Tests the preview mode functionality
+4. **test_preview_mode.sh**: Tests the dry run mode functionality
 5. **test_edge_cases.sh**: Tests edge cases and error handling
 
 ## Adding New Tests
