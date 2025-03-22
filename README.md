@@ -1,5 +1,7 @@
 # urldecode-wrap -- Execute commands with URL-decoded arguments
 
+[![Test urldecode-wrap](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml/badge.svg)](https://github.com/mhalle/urldecode-wrap/actions/workflows/test.yml)
+
 ## SYNOPSIS
 
 `urldecode-wrap [OPTIONS] [--] EXECUTABLE [ARGUMENTS...]`  
