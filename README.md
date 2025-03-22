@@ -11,13 +11,26 @@
 
 ## Description
 
-`urlargs` is a utility that decodes URL-encoded arguments and passes them to the specified executable. It addresses shell quoting challenges in many scripting scenarios, particularly ones where scripts call other scripts or arguments like code fragments, regular expressions, or SQL queries that might contain special characters for the shell are passed as arguments.
+`urlargs` is a utility that decodes URL-encoded arguments and passes
+them to the specified executable. It addresses shell quoting
+challenges in many scripting scenarios, particularly ones where
+scripts call other scripts or arguments like code fragments, regular
+expressions, or SQL queries that might contain special characters for
+the shell are passed as arguments.
 
-In filter mode (`--filter`), it also decodes URL-encoded input from stdin, making it versatile for various command-line scenarios.
+In filter mode (`--filter`), it also decodes URL-encoded input from
+stdin, making it versatile for various command-line scenarios.
 
 ## Why use URL encoding?
 
-It's simple. It's ubiquitous and well-known. Encoding is simple to implement (most programming languages have library support). URL Encoding also retains some readability for those characters that don't need to be encoded, and many people recognize the most common encodings like %20 for space. This helps with verifyability of the result, particularly for generated command lines.
+URL encoding (or, more precisely, percent encoding) is simple. It's
+ubiquitous and well-known. Encoding is simple to implement (most
+programming languages have library support). It's simple enough that
+an LLM can generally do it without requiring an outside tool. URL
+Encoding also retains some readability for those characters that don't
+need to be encoded, and many people recognize the most common
+encodings like %20 for space. This helps with verifyability of the
+result, particularly for generated command lines.
 
 ## Options
 
@@ -37,9 +50,15 @@ It's simple. It's ubiquitous and well-known. Encoding is simple to implement (mo
 
 When working with LLMs to generate complex command arguments:
 
-1. **Instruct the LLM to URL-encode special characters**: Ask the LLM to URL-encode any arguments containing special characters (spaces, quotes, semicolons, etc.)
+1. **Instruct the LLM to URL-encode special characters**: Ask the LLM
+to URL-encode any arguments containing special characters (spaces,
+quotes, semicolons, etc.)
 
-2. **Consider using double quotes**: Wrap URL-encoded arguments in double quotes if they contain characters that the shell might interpret (like spaces, wildcards, etc.). While the percent sign itself isn't generally interpreted by the shell, quoting ensures all parts of your encoded argument are properly passed to the script.
+2. **Consider using double quotes**: Wrap URL-encoded arguments in
+double quotes if they contain characters that the shell might
+interpret (like spaces, wildcards, etc.). While the percent sign
+itself isn't generally interpreted by the shell, quoting ensures all
+parts of your encoded argument are properly passed to the script.
 
 3. **Be comprehensive with encoding**: For commands with shell metacharacters, encode ALL potentially problematic characters:
    - Spaces (`%20`) - IMPORTANT: Always use `%20` for spaces, never use + signs
@@ -62,7 +81,9 @@ When working with LLMs to generate complex command arguments:
    - Form feeds (`%0C`)
    - Any other character with special meaning in shells
 
-There is no harm in URL-encoding liberally - non-special characters pass through unchanged, while potentially problematic ones are protected.
+There is no harm in URL-encoding liberally - non-special characters
+pass through unchanged, while potentially problematic ones are
+protected.
 
 **Example transformation:**
 ```
@@ -159,13 +180,11 @@ If you're implementing support for this utility in your LLM:
 
 Michael Halle (urldecode-wrap@m.halle.us)
 
-This utility is specifically designed to simplify complex command arguments when working with LLM-generated shell commands.
-
 ## License
 
 This project is licensed under the Apache License, Version 2.0. See the [LICENSE.md](LICENSE.md) file for details.
 
 ## Bugs and limitations
 
-- Currently processes one line at a time in filter mode
+- Currently processes one line at a time in filter mode. Don't try to use it for binary data.
 - Report bugs to the project repository.
