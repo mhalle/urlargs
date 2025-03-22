@@ -8,14 +8,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-shell:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         shell: [bash, sh, dash, zsh]
       fail-fast: false  # Continue with other shells even if one fails
     
-    name: Test with ${{ matrix.shell }}
+    name: Test shell with ${{ matrix.shell }}
     
     steps:
     - uses: actions/checkout@v3
@@ -27,8 +27,28 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y zsh dash
     
-    - name: Make script executable
-      run: chmod +x urlargs tests/run_tests.sh tests/test_*.sh
+    - name: Make scripts executable
+      run: chmod +x urlargs tests/run_tests_shell.sh tests/run_tests_perl.sh tests/test_*.sh
     
     - name: Run tests with ${{ matrix.shell }}
-      run: cd tests && ./run_tests.sh ${{ matrix.shell }}
+      run: cd tests && ./run_tests_shell.sh ${{ matrix.shell }}
+  
+  test-perl:
+    runs-on: ubuntu-latest
+    name: Test Perl implementation
+    
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Install Perl dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y liburi-perl
+    
+    - name: Make scripts executable
+      run: chmod +x perl/urlargs.pl tests/run_tests_perl.sh tests/test_*.sh
+    
+    - name: Run Perl tests
+      run: cd tests && ./run_tests_perl.sh
